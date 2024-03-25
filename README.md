@@ -35,4 +35,4 @@ o5 - ice-cream, wine, beef
 [1, 0, 1]
 o6 - ice-cream, beer, fish
 [1, 1, 0]
-o7 - ice-cream, beer, bee
+o7 - ice-cream, beer, beef
