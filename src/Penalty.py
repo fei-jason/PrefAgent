@@ -14,7 +14,7 @@ def penalty_menu():
       + "\n6. Back to previous menu")
     
 ## MAIN FUNCTION
-def penalty_logic(att_file_path, pen_file_path):
+def penalty_logic(att_file_path, cons_file_path, pen_file_path):
     while True:
         penalty_menu()
         user_input = int(input("Choose the reasoning task to perform: "))
@@ -27,7 +27,7 @@ def penalty_logic(att_file_path, pen_file_path):
                     print(f"o{i} - {', '.join(items)}")
                 print("")
             case 2: # feasibility
-                feasibility(int_prod)
+                feasibility(cons_file_path)
                 print("")
             case 6: # exit
                 break
@@ -78,13 +78,20 @@ def encoding(att_file_path):
 
     return product, int_product 
 
-def feasibility(product):
-    cnf = CNF(from_clauses=[[-2, -3]])
+def feasibility(cons_file_path):
+    # cnf_list = []
+    # with open(cons_file_path, "r") as file:
+    #     for line in file:
+    #         cnf_list.append(to_cnf(line))
+
+    cnf = CNF(from_clauses=[[-4, 1]])
 
     with Solver(bootstrap_with=cnf) as solver:
         print('Formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
+        for item in solver.enum_models():
+            print(item)
         model_list = list(solver.enum_models())
-        print(f"There are {len(model_list)} feaisble objects")
+        print(f"There are {len(model_list)} feaisble objects") 
 
 def to_cnf(line):
     items = line.split()
@@ -97,3 +104,11 @@ def to_cnf(line):
             i += 2 #skip NOT and corresponding item
         elif items[i] == "AND":
             pass # do something about it idk 
+        elif items[i] == "OR":
+            i += 1
+            pass #temp
+        else:
+            result.append(attribute_table[items[i]])
+            i += 1
+
+    return result

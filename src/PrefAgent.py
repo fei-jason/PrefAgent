@@ -8,6 +8,7 @@ directory_path = "ExampleTestCase/"
 # att_file_path = directory_path + input("Enter Attribute File Name: ")
 # cons_file_path = directory_path + input("Enter Constraint File Name: ")
 att_file_path = directory_path + "attributes.txt"
+cons_file_path = directory_path + "constraints.txt"
 
 while True:
     print("Choose the preference logic to use: \n1. Penalty Logic \n2. Qualitative Choice Logic\n3. Exit")
@@ -17,6 +18,6 @@ while True:
             print("You have picked Penalty Logic")
             # pen_file_path = directory_path + input("Enter Preferences File Name: ")
             pen_file_path = directory_path + "penaltylogic.txt"
-            Penalty.penalty_logic(att_file_path, pen_file_path)
+            Penalty.penalty_logic(att_file_path, cons_file_path, pen_file_path)
         case 3:
             break
