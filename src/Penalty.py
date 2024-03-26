@@ -1,10 +1,14 @@
-import itertools
+import itertools, random
 from pysat.formula import CNF
 from pysat.solvers import Solver
 from prettytable import PrettyTable
 
+## attribute table is a dictionary of all the attributes and their values startin from 1 and -1
+## encoding table is not used somehow will revist if used
+## int_prod are all the possible combinations
 attribute_table = {}
 encoding_table = {}
+int_prod = []
 table = PrettyTable()
 
 def penalty_menu():
@@ -23,8 +27,11 @@ def penalty_logic(att_file_path, cons_file_path, pen_file_path):
         user_input = int(input("Choose the reasoning task to perform: "))
 
         # runs encoding
+        # product is the printable version [cake, wine, beer], int_prod is a int encoding [1,2,3]
+        # model_list are the feasible outcomes o1, o2, o7, etc.
         product, int_prod = encoding(att_file_path)
         model_list = feasibility(cons_file_path)
+
         match(user_input):
             case 1: # encoding
                 for i, items in enumerate(product):
@@ -36,16 +43,42 @@ def penalty_logic(att_file_path, cons_file_path, pen_file_path):
                 print(f"There are {len(model_list)} feaisble objects") 
                 print("")
             case 3: # show table
+                table.clear()
                 name = []
                 for i, items in enumerate(int_prod):
                     for model in model_list:
                         if list(items) == model:
                             name.append(f"o{i}")
                 table.add_column("encoding", name)
-                show_table(model_list, pen_file_path)
+                temp = show_table(model_list, pen_file_path)
                 print(table)
-            case 4:
-                print("")
+                table.clear()
+            case 4: # exemplification
+                table.clear()
+                dict = show_table(model_list, pen_file_path)
+
+                rand1, rand2 = random.sample(dict.keys(), 2)
+
+                print(f"Two randomly selected feasible objects are o{find_index(list(rand1), int_prod)} and o{find_index(list(rand2), int_prod)}")
+                if dict[rand1] < dict[rand2]:
+                    print(f"o{find_index(list(rand1), int_prod)} is strickly preferred to o{find_index(list(rand2), int_prod)}")
+                elif dict[rand1] == dict[rand2]:
+                    print(f"o{find_index(list(rand1), int_prod)} is equivilent to o{find_index(list(rand2), int_prod)}")
+                else:
+                    print(f"o{find_index(list(rand2), int_prod)} is strickly preferred to o{find_index(list(rand1), int_prod)}")
+                # for item in temp:
+                #     i = find_index(list(item), int_prod)
+                #     print(f"{i} - {dict[item]}")
+                # print("")
+            case 5: #optimal
+                table.clear()
+                dict = show_table(model_list, pen_file_path)
+                
+                print("All optimal objects: ", end="")
+                for item in dict:
+                    if dict[item] == 0:
+                        print(f"o{find_index(list(item), int_prod)} ", end="")
+                print()
             case 6: # exit
                 break
           
@@ -124,8 +157,6 @@ def show_table(int_prod, pen_file_path):
     penalty_list = []
     # each object will have a dic for the penalty
     penalty_dict = {}
-    key = 0
-
     table_columns = []
 
     with open(pen_file_path, "r") as file:
@@ -139,29 +170,36 @@ def show_table(int_prod, pen_file_path):
         cnf, condition = to_cnf(logic)
 
         for object in int_prod:
-
-            if key not in penalty_dict:
-                penalty_dict[key] = 0
-
+            
+            object_tuple = tuple(object)
+            if object_tuple not in penalty_dict:
+                penalty_dict[object_tuple] = 0
+            # if key not in penalty_dict:
+            #     penalty_dict[key] = 0
+            
             if condition == "AND":
                 if cnf[0] not in object or cnf[1] not in object:
                     table_columns.append(penalty)
-                    penalty_dict[key] += penalty
+                    #penalty_dict[key] += penalty
+                    penalty_dict[object_tuple] += penalty
                 else:
                     table_columns.append(0)
             else:
                 if cnf[0] not in object and cnf[1] not in object:
                     table_columns.append(penalty)
-                    penalty_dict[key] += penalty
+                    #penalty_dict[key] += penalty
+                    penalty_dict[object_tuple] += penalty
                 else:
                     table_columns.append(0)
-            key += 1
+            #key += 1
             
         table.add_column(logic, table_columns)
         table_columns = []
-        key = 0
 
-    table.add_column("total penalty", list(penalty_dict.values()))
+    list_total_penalty = list(penalty_dict.values())
+    table.add_column("total penalty", list_total_penalty)
+
+    return penalty_dict
 
 def to_cnf(line):
     items = line.split()
@@ -183,3 +221,9 @@ def to_cnf(line):
             i += 1
 
     return result, condition
+
+def find_index(model, int_prod):
+    for i, items in enumerate(int_prod):
+        if list(items) == model:
+            return i
+    return None  
