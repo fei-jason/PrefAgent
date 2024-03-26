@@ -1,8 +1,11 @@
 import itertools
 from pysat.formula import CNF
 from pysat.solvers import Solver
+from prettytable import PrettyTable
 
 attribute_table = {}
+encoding_table = {}
+table = PrettyTable()
 
 def penalty_menu():
     print("Choose the reasoning task to perform: "
@@ -21,13 +24,27 @@ def penalty_logic(att_file_path, cons_file_path, pen_file_path):
 
         # runs encoding
         product, int_prod = encoding(att_file_path)
+        model_list = feasibility(cons_file_path)
         match(user_input):
             case 1: # encoding
                 for i, items in enumerate(product):
                     print(f"o{i} - {', '.join(items)}")
+                # for i, items in enumerate(int_prod):
+                #     print(f"o{i} - {items}")
                 print("")
             case 2: # feasibility
-                feasibility(cons_file_path)
+                print(f"There are {len(model_list)} feaisble objects") 
+                print("")
+            case 3: # show table
+                name = []
+                for i, items in enumerate(int_prod):
+                    for model in model_list:
+                        if list(items) == model:
+                            name.append(f"o{i}")
+                table.add_column("encoding", name)
+                show_table(model_list, pen_file_path)
+                print(table)
+            case 4:
                 print("")
             case 6: # exit
                 break
@@ -79,22 +96,63 @@ def encoding(att_file_path):
     return product, int_product 
 
 def feasibility(cons_file_path):
-    # cnf_list = []
-    # with open(cons_file_path, "r") as file:
-    #     for line in file:
-    #         cnf_list.append(to_cnf(line))
-
-    cnf = CNF(from_clauses=[[-4, 1]])
+    cnf_list = []
+    with open(cons_file_path, "r") as file:
+        for line in file:
+            cnf, condition = to_cnf(line)
+            cnf_list.append(cnf)
+    
+    for attr in attribute_table.values():
+        for clause in cnf_list:
+            if attr in clause or -attr in clause:
+                break
+            else:
+                cnf_list.append([-attr, attr])
+                
+    cnf = CNF(from_clauses=cnf_list)
+    #cnf = CNF(from_clauses=[[-2,1],[-3,3]])
 
     with Solver(bootstrap_with=cnf) as solver:
-        print('Formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
-        for item in solver.enum_models():
-            print(item)
+        #print('Formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
+        # for item in solver.enum_models():
+        #     print(item)
         model_list = list(solver.enum_models())
-        print(f"There are {len(model_list)} feaisble objects") 
+    
+    return model_list
+
+def show_table(int_prod, pen_file_path):
+    penalty_list = []
+    total_penalty = []
+    table_columns = []
+
+    with open(pen_file_path, "r") as file:
+        for line in file:
+            penalty_list.append(line.strip())
+
+    for line in penalty_list:
+        logic, penalty_str = map(str.strip, line.split(','))
+        penalty = int(penalty_str)
+        cnf, condition = to_cnf(logic)
+
+        for object in int_prod:
+            if condition == "AND":
+                if cnf[0] not in object or cnf[1] not in object:
+                    table_columns.append(penalty)
+                else:
+                    table_columns.append(0)
+            else:
+                if cnf[0] not in object and cnf[1] not in object:
+                    table_columns.append(penalty)
+                else:
+                    table_columns.append(0)
+            
+        table.add_column(logic, table_columns)
+        table_columns = []
+
 
 def to_cnf(line):
     items = line.split()
+    condition = "OR"
     result = []
     
     i = 0
@@ -103,12 +161,12 @@ def to_cnf(line):
             result.append(-1 * attribute_table[items[i+1]]) #i+1 for the item after NOT
             i += 2 #skip NOT and corresponding item
         elif items[i] == "AND":
-            pass # do something about it idk 
+            condition = "AND"
+            i += 1
         elif items[i] == "OR":
             i += 1
-            pass #temp
         else:
             result.append(attribute_table[items[i]])
             i += 1
 
-    return result
+    return result, condition
