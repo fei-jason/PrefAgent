@@ -122,33 +122,46 @@ def feasibility(cons_file_path):
 
 def show_table(int_prod, pen_file_path):
     penalty_list = []
-    total_penalty = []
+    # each object will have a dic for the penalty
+    penalty_dict = {}
+    key = 0
+
     table_columns = []
 
     with open(pen_file_path, "r") as file:
         for line in file:
             penalty_list.append(line.strip())
 
+    # essentially will run through each line of the penaltylogic file to find the penalty for each object
     for line in penalty_list:
         logic, penalty_str = map(str.strip, line.split(','))
         penalty = int(penalty_str)
         cnf, condition = to_cnf(logic)
 
         for object in int_prod:
+
+            if key not in penalty_dict:
+                penalty_dict[key] = 0
+
             if condition == "AND":
                 if cnf[0] not in object or cnf[1] not in object:
                     table_columns.append(penalty)
+                    penalty_dict[key] += penalty
                 else:
                     table_columns.append(0)
             else:
                 if cnf[0] not in object and cnf[1] not in object:
                     table_columns.append(penalty)
+                    penalty_dict[key] += penalty
                 else:
                     table_columns.append(0)
+            key += 1
             
         table.add_column(logic, table_columns)
         table_columns = []
+        key = 0
 
+    table.add_column("total penalty", list(penalty_dict.values()))
 
 def to_cnf(line):
     items = line.split()
