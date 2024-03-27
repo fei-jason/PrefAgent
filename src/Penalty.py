@@ -62,9 +62,23 @@ def penalty_logic(att_file_path, cons_file_path, pen_file_path):
                     dict = show_table(model_list, pen_file_path)
                     
                     print("All optimal objects: ", end="")
+                    
+                    smallest = 0
+                    optimal = []
                     for item in dict:
-                        if dict[item] == 0:
-                            print(f"o{find_index(list(item), int_prod)} ", end="")
+                        curr = dict[item]
+                        if smallest == 0:
+                            smallest = curr
+                            optimal.append(item)
+                        elif curr < smallest:
+                            smallest = curr
+                            optimal = [item]
+                        elif curr == smallest:
+                            optimal.append(item)
+                    
+                    for i in optimal:
+                        print(f"o{find_index(list(i), int_prod)} ", end="")
+
                     print()
                 case 6: # exit
                     break

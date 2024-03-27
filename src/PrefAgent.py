@@ -6,17 +6,22 @@ print("Welcome to PrefAgent!\n")
 # directory_path = "ExampleTestCase/"
 # directory_path = "CustomTestCase/"
 
+print(os.getcwd())
+
 try:
     num = int(input("Which directory?\n[1]ExampleTestCase/\n[2]CustomTestCase/\nEnter number and enter: "))
     if num == 1:
-        directory_path = "ExampleTestCase/"
+        directory_path = "../ExampleTestCase/"
     else:
-        directory_path = "CustomTestCase/"
+        directory_path = "../CustomTestCase/"
 except ValueError:
     print("Please input a valid number")
 
 att_file_path = directory_path + input("Enter Attribute File Name: ")
 cons_file_path = directory_path + input("Enter Constraint File Name: ")
+
+att_file_path = os.path.abspath(att_file_path)
+cons_file_path = os.path.abspath(cons_file_path)
 
 if os.path.exists(att_file_path) and os.path.exists(cons_file_path):
     while True:
@@ -46,3 +51,4 @@ if os.path.exists(att_file_path) and os.path.exists(cons_file_path):
 
 else:
     print("File path error, try again.")
+    print(f"{att_file_path} - {cons_file_path}")
