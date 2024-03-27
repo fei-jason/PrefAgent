@@ -1,4 +1,5 @@
 import itertools, random
+import Utils as utils
 from pysat.formula import CNF
 from pysat.solvers import Solver
 from prettytable import PrettyTable
@@ -10,20 +11,11 @@ attribute_table = {}
 encoding_table = {}
 int_prod = []
 table = PrettyTable()
-
-def penalty_menu():
-    print("Choose the reasoning task to perform: "
-      + "\n1. Encoding"
-      + "\n2. Feasibility Checking"
-      + "\n3. Show the Table"
-      + "\n4. Exemplification"
-      + "\n5. Omni-optimization"
-      + "\n6. Back to previous menu")
     
 ## MAIN FUNCTION
 def penalty_logic(att_file_path, cons_file_path, pen_file_path):
     while True:
-        penalty_menu()
+        utils.show_menu()
         user_input = int(input("Choose the reasoning task to perform: "))
 
         # runs encoding
@@ -132,7 +124,7 @@ def feasibility(cons_file_path):
     cnf_list = []
     with open(cons_file_path, "r") as file:
         for line in file:
-            cnf, condition = to_cnf(line)
+            cnf, condition = utils.to_cnf(line, attribute_table)
             cnf_list.append(cnf)
     
     for attr in attribute_table.values():
@@ -167,7 +159,7 @@ def show_table(int_prod, pen_file_path):
     for line in penalty_list:
         logic, penalty_str = map(str.strip, line.split(','))
         penalty = int(penalty_str)
-        cnf, condition = to_cnf(logic)
+        cnf, condition = utils.to_cnf(logic, attribute_table)
 
         for object in int_prod:
             
@@ -201,26 +193,6 @@ def show_table(int_prod, pen_file_path):
 
     return penalty_dict
 
-def to_cnf(line):
-    items = line.split()
-    condition = "OR"
-    result = []
-    
-    i = 0
-    while i < len(items):
-        if items[i] == "NOT":
-            result.append(-1 * attribute_table[items[i+1]]) #i+1 for the item after NOT
-            i += 2 #skip NOT and corresponding item
-        elif items[i] == "AND":
-            condition = "AND"
-            i += 1
-        elif items[i] == "OR":
-            i += 1
-        else:
-            result.append(attribute_table[items[i]])
-            i += 1
-
-    return result, condition
 
 def find_index(model, int_prod):
     for i, items in enumerate(int_prod):
