@@ -45,6 +45,19 @@ def qualitative_logic(att_file_path, cons_file_path, qual_file_path):
                 show_table(feasible_table, list_logic, dict_list_logic)
                 print(table)
                 print()
+            case 4:
+                table.clear()
+                dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
+                exemplification(dict_quality_comparison)
+                print()
+            case 5:
+                table.clear()
+                dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
+                optimal = omnioptimization(dict_quality_comparison)
+                print("All optimal objects: ", end="")
+                for i in optimal:
+                    print(f"o{i} ", end="")
+                print()
             case 6:
                 break
 
@@ -134,35 +147,111 @@ def comprehend_qualitative_choice(qual_file_path):
     return list_logic, dict_logic_name
 
 def show_table(feasible_table, list_logic, list_logic_name):
+    """
+    feasible_table (dictionary): keys are index o1, o2, ettc. values are their corresponding integer model [-2,1,2]
 
+    list_logic (list): a list of lists. each list contains the CNF logic. it will not work with more than
+    5 words if the line were to be split [attribute, attribute, condition IF]
+
+    list_logic_name (dictionary): keys are a tuple of the lists inside list_logic, values is the corresponding name. used to identify which 
+    logic goes with who since the logic is translated to CNF.
+    """
+    ## this dictionary will keep track of each object's number o1, o2, etc. and their preference value across the row; ie, 1, 2, inf, 2, inf
+    ## INFINITY WILL BE REPRESENTED AS A 0 
+    dict_quality_comparison = {}
+    value = None
     table_columns = []
     for item in list_logic:
 
         for i in feasible_table:
+
+            if i not in dict_quality_comparison:
+                dict_quality_comparison[i] = ""
+
             # there exist condition
             if item[2] != 0:
 
                 if item[2] in feasible_table[i]:
                     if item[0] in feasible_table[i] and item[1] in feasible_table[i]:
-                        table_columns.append("inf")
+                        value = float('inf')
                     elif item[0] in feasible_table[i]:
-                        table_columns.append(1)
+                        value = 1
                     elif item[1] in feasible_table[i]:
-                        table_columns.append(2)
+                        value = 2
                     else:
-                        table_columns.append("inf")
+                        value = float('inf')
                 else:
-                    table_columns.append("inf")
+                    value = float('inf')
             # there exists no condition
             else:
                 if item[0] in feasible_table[i] and item[1] in feasible_table[i]:
-                    table_columns.append("inf")
+                    value - float('inf')
                 elif item[0] in feasible_table[i]:
-                    table_columns.append(1)
+                    value = 1
                 elif item[1] in feasible_table[i]:
-                    table_columns.append(2)
+                    value = 2
                 else:
-                    table_columns.append("inf")
+                    value = float('inf')
 
+            table_columns.append(value)
+            if value == float('inf'):
+                dict_quality_comparison[i] += str(0)
+            else:
+                dict_quality_comparison[i] += str(value)
         table.add_column(list_logic_name[tuple(item)], table_columns)
         table_columns = []
+    
+    return dict_quality_comparison
+
+def exemplification(dict_quality_comparison):
+    """
+    dict_quality_comparison (dictionary): will keep track of each object o1, o2, that is feasible and their respective preference rating across the row.
+    For example, o2: 1212infinf
+    """
+    rand1, rand2 = random.sample(dict_quality_comparison.keys(), 2)
+    str_comparison = ""
+
+    str1 = dict_quality_comparison[rand1]
+    str2 = dict_quality_comparison[rand2]
+
+    if len(str1) == len(str2):
+        for i in range(len(str1)):
+            if str1[i] > str2[i]:
+                str_comparison += str(1)
+            elif str1[i] < str2[i]:
+                str_comparison += str(2)
+            elif str1[i] == str2[i]:
+                str_comparison += str(0)
+    else:
+        print(f"Length of {str1} and {str2} are different. Something went really wrong.")
+
+    print(f"Two randomly selected feasible objects are o{rand1} and o{rand2}.")
+
+    if '1' in str_comparison and '2' in str_comparison:
+        print(f"o{rand1} and o{rand2} are incomparable")
+    elif '1' in str_comparison and '2' not in str_comparison:
+        print(f"o{rand1} is strickly preferred over o{rand2}")
+    elif '2' in str_comparison and '1' not in str_comparison:
+        print(f"o{rand2} is strickly preferred over o{rand1}")
+    else:
+        print(f"o{rand1} and o{rand2} are equal")
+
+def omnioptimization(dict_quality_comparison):
+    optimal = []
+    smallest = 0
+    for i in dict_quality_comparison:
+        sum = 0
+        
+        for digit in dict_quality_comparison[i]:
+            sum += int(digit)
+        
+        if smallest == 0:
+            smallest = sum
+            optimal.append(i)
+        elif sum < smallest:
+            smallest = sum
+            optimal = [i]
+        elif sum == smallest:
+            optimal.append(i)
+    
+    return optimal
