@@ -3,7 +3,17 @@ import Penalty, Qualitative, collections, os
 print("Welcome to PrefAgent!\n")
 
 # change directory path
-directory_path = "ExampleTestCase/"
+# directory_path = "ExampleTestCase/"
+# directory_path = "CustomTestCase/"
+
+try:
+    num = int(input("Which directory?\n[1]ExampleTestCase/\n[2]CustomTestCase/\nEnter number and enter: "))
+    if num == 1:
+        directory_path = "ExampleTestCase/"
+    else:
+        directory_path = "CustomTestCase/"
+except ValueError:
+    print("Please input a valid number")
 
 att_file_path = directory_path + input("Enter Attribute File Name: ")
 cons_file_path = directory_path + input("Enter Constraint File Name: ")

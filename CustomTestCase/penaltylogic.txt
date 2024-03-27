@@ -1,0 +1,4 @@
+ketchup AND water, 10
+mustard AND wonton, 10
+pho OR volcano, 6
+long-grain OR boba, 5 

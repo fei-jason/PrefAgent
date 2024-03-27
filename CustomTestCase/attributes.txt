@@ -1,0 +1,8 @@
+main: pho, ramen
+drinks: water, boba
+starter: dumpling, spring-roll
+condiments: ketchup, mustard
+sushi: volcano, dynamite
+curry: yellow, panang
+rice: short-grain, long-grain
+soup: egg-drop, wonton

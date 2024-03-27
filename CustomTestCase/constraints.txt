@@ -1,0 +1,6 @@
+NOT short-grain OR volcano
+water OR boba
+NOT mustard AND NOT wonton
+ramen AND dynamite
+yellow OR dumpling
+spring-roll OR boba
