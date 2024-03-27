@@ -4,16 +4,16 @@ print("Welcome to PrefAgent!\n")
 
 # change directory path
 # directory_path = "ExampleTestCase/"
-# directory_path = "CustomTestCase/"
+# directory_path = "TestCase/"
 
 print(os.getcwd())
 
 try:
-    num = int(input("Which directory?\n[1]ExampleTestCase/\n[2]CustomTestCase/\nEnter number and enter: "))
+    num = int(input("Which directory?\n[1]ExampleTestCase/\n[2]TestCase/\nEnter number and enter: "))
     if num == 1:
         directory_path = "../ExampleTestCase/"
     else:
-        directory_path = "../CustomTestCase/"
+        directory_path = "../TestCase/"
 except ValueError:
     print("Please input a valid number")
 
