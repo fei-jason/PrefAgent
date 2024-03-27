@@ -24,55 +24,52 @@ def penalty_logic(att_file_path, cons_file_path, pen_file_path):
         product, int_prod = encoding(att_file_path)
         model_list = feasibility(cons_file_path)
 
-        match(user_input):
-            case 1: # encoding
-                for i, items in enumerate(product):
-                    print(f"o{i} - {', '.join(items)}")
-                # for i, items in enumerate(int_prod):
-                #     print(f"o{i} - {items}")
-                print("")
-            case 2: # feasibility
-                print(f"There are {len(model_list)} feaisble objects") 
-                print("")
-            case 3: # show table
-                table.clear()
-                name = []
-                for i, items in enumerate(int_prod):
-                    for model in model_list:
-                        if list(items) == model:
-                            name.append(f"o{i}")
-                table.add_column("encoding", name)
-                temp = show_table(model_list, pen_file_path)
-                print(table)
-                table.clear()
-            case 4: # exemplification
-                table.clear()
-                dict = show_table(model_list, pen_file_path)
+        try:
+            match(user_input):
+                case 1: # encoding
+                    for i, items in enumerate(product):
+                        print(f"o{i} - {', '.join(items)}")
+                    print("")
+                case 2: # feasibility
+                    print(f"There are {len(model_list)} feaisble objects") 
+                    print("")
+                case 3: # show table
+                    table.clear()
+                    name = []
+                    for i, items in enumerate(int_prod):
+                        for model in model_list:
+                            if list(items) == model:
+                                name.append(f"o{i}")
+                    table.add_column("encoding", name)
+                    temp = show_table(model_list, pen_file_path)
+                    print(table)
+                    table.clear()
+                case 4: # exemplification
+                    table.clear()
+                    dict = show_table(model_list, pen_file_path)
 
-                rand1, rand2 = random.sample(dict.keys(), 2)
+                    rand1, rand2 = random.sample(dict.keys(), 2)
 
-                print(f"Two randomly selected feasible objects are o{find_index(list(rand1), int_prod)} and o{find_index(list(rand2), int_prod)}")
-                if dict[rand1] < dict[rand2]:
-                    print(f"o{find_index(list(rand1), int_prod)} is strickly preferred to o{find_index(list(rand2), int_prod)}")
-                elif dict[rand1] == dict[rand2]:
-                    print(f"o{find_index(list(rand1), int_prod)} is equivilent to o{find_index(list(rand2), int_prod)}")
-                else:
-                    print(f"o{find_index(list(rand2), int_prod)} is strickly preferred to o{find_index(list(rand1), int_prod)}")
-                # for item in temp:
-                #     i = find_index(list(item), int_prod)
-                #     print(f"{i} - {dict[item]}")
-                # print("")
-            case 5: #optimal
-                table.clear()
-                dict = show_table(model_list, pen_file_path)
-                
-                print("All optimal objects: ", end="")
-                for item in dict:
-                    if dict[item] == 0:
-                        print(f"o{find_index(list(item), int_prod)} ", end="")
-                print()
-            case 6: # exit
-                break
+                    print(f"Two randomly selected feasible objects are o{find_index(list(rand1), int_prod)} and o{find_index(list(rand2), int_prod)}")
+                    if dict[rand1] < dict[rand2]:
+                        print(f"o{find_index(list(rand1), int_prod)} is strickly preferred to o{find_index(list(rand2), int_prod)}")
+                    elif dict[rand1] == dict[rand2]:
+                        print(f"o{find_index(list(rand1), int_prod)} is equivilent to o{find_index(list(rand2), int_prod)}")
+                    else:
+                        print(f"o{find_index(list(rand2), int_prod)} is strickly preferred to o{find_index(list(rand1), int_prod)}")
+                case 5: #optimal
+                    table.clear()
+                    dict = show_table(model_list, pen_file_path)
+                    
+                    print("All optimal objects: ", end="")
+                    for item in dict:
+                        if dict[item] == 0:
+                            print(f"o{find_index(list(item), int_prod)} ", end="")
+                    print()
+                case 6: # exit
+                    break
+        except ValueError:
+            print("Invalid input, try again.")
           
 def encoding(att_file_path):
     attributes = []

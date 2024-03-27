@@ -29,38 +29,40 @@ def qualitative_logic(att_file_path, cons_file_path, qual_file_path):
         
         list_logic, dict_list_logic = comprehend_qualitative_choice(qual_file_path)
 
-        match(user_input):
-            case 1: #encoding
-                for i, items in enumerate(str_list_attribute):
-                    print(f"o{i} - {', '.join(items)}")
-                print()
-            case 2: #feasibility
-                print(f"There are {len(feasible_table)} feasible objects.")
-            case 3: #show_table
-                table.clear()
-                name = []
-                for i in feasible_table:
-                    name.append(f"o{i}")
-                table.add_column("encoding", name)
-                show_table(feasible_table, list_logic, dict_list_logic)
-                print(table)
-                print()
-            case 4:
-                table.clear()
-                dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
-                exemplification(dict_quality_comparison)
-                print()
-            case 5:
-                table.clear()
-                dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
-                optimal = omnioptimization(dict_quality_comparison)
-                print("All optimal objects: ", end="")
-                for i in optimal:
-                    print(f"o{i} ", end="")
-                print()
-            case 6:
-                break
-
+        try:
+            match(user_input):
+                case 1: #encoding
+                    for i, items in enumerate(str_list_attribute):
+                        print(f"o{i} - {', '.join(items)}")
+                    print()
+                case 2: #feasibility
+                    print(f"There are {len(feasible_table)} feasible objects.")
+                case 3: #show_table
+                    table.clear()
+                    name = []
+                    for i in feasible_table:
+                        name.append(f"o{i}")
+                    table.add_column("encoding", name)
+                    show_table(feasible_table, list_logic, dict_list_logic)
+                    print(table)
+                    print()
+                case 4:
+                    table.clear()
+                    dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
+                    exemplification(dict_quality_comparison)
+                    print()
+                case 5:
+                    table.clear()
+                    dict_quality_comparison = show_table(feasible_table, list_logic, dict_list_logic)
+                    optimal = omnioptimization(dict_quality_comparison)
+                    print("All optimal objects: ", end="")
+                    for i in optimal:
+                        print(f"o{i} ", end="")
+                    print()
+                case 6:
+                    break
+        except ValueError:
+            print("Invalid input, please try again.")
 
 def encoding(att_file_path):
     list_attributes = []
